@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+<body>
+	<style>
+		.wrapper {
+			width: 80%;
+			margin: 20px auto 0;
+		}
+	</style>
+	<div class="wrapper">
+		<p><span class="name-ref" id="ciaravino">Asia Ciaravino</span></p>
+		<p><span class="name-ref" id="benavides">Edward Benavides</span></p>
+		<p><span class="name-ref" id="lane">Phil Lane</span></p>
+		<p><span class="name-ref" id="bonner">Bernice Kearney Bonner</span></p>
+	</div>
+	<div id="freeform">
+		<style>
+			#source-reference.modal-bg {
+				position: absolute;
+			    top: 0;
+			    left: 0;
+			    width: 100vw;
+			    height: 100vh;
+			    background-color: rgba(0,0,0,0.5);
+			    z-index: 4000;
+			    display: none;
+			    cursor: pointer;
+			}
+
+			#source-reference .modal {
+			    width: 86vw;
+			    margin: 18vh auto 38vh;
+			    height: 43vh;
+			    background-color: white;
+			    color: black;
+			    padding: 1vh 2vw 0;
+			    font-size: 16px;
+			    border-radius: 24px;
+			    max-width: 600px;
+			    position: relative;
+			    cursor: auto;
+			}
+
+			#source-reference .modal .org {
+			    font-size: 2em;
+			    margin: 40px 20px 20px;
+			    line-height: 1.1;
+			}
+
+			#source-reference .modal .org.ksat {
+				color: #1775AE;
+				border-bottom: 1px #1775AE solid;
+			}
+
+			#source-reference .modal .org.tricentennial {
+				color: #D64946;
+				border-bottom: 1px #D64946 solid;
+			}
+
+			#source-reference .modal .name {
+				font-size: 1.6em;
+				margin-left: 20px;
+				margin-bottom: 10px;
+			}
+
+			#source-reference .modal .title {
+				margin-left: 20px;
+				margin-bottom: 10px;
+				font-size: 1.2em;
+				font-style: italic;
+			}
+
+			#source-reference .modal-close-btn {
+			    position: absolute;
+			    z-index: 1001;
+			    right: 1rem;
+			    top: 1rem;
+			    width: 1.5rem;
+			    height: 1.5rem;
+			    border-radius: 100%;
+			    display: inline-block;
+			    white-space: nowrap;
+			    overflow: hidden;
+			    cursor: pointer;
+			}
+
+			p span.name-ref {
+				cursor: pointer;
+			}
+
+			@media screen and (min-width: 768px) {
+				#source-reference .modal {
+					width: 36vh;
+					height: 28vh;
+					margin: 18vh auto 53vh;
+				}
+
+				#source-reference .modal .org {
+					margin-top: 60px;
+				}
+			}
+		</style>
+		<div id="source-reference" class="modal-bg">
+			<div class="modal">
+				<div class="org"></div>
+				<div class="name"></div>
+				<div class="title"></div>
+				<div class="modal-close-btn"><img src="http://ww1.hdnux.com/photos/67/04/21/14435436/4/rawImage.png" width="100%" height="100%" /></div>
+			</div>
+		</div>
+	</div>
+	<script>
+		(function (){
+			var characters = {
+				ciaravino: {
+					isKSAT: false,
+					name: 'Asia Ciaravino</span></p>',
+					title: 'Chief Operating Officer',
+				},
+				benavides: {
+					isKSAT: false,
+					name: 'Edward Benavides',
+					title: 'Chief Executive Officer',
+				},
+				lane: {
+					isKSAT: true,
+					name: 'Phil Lane',
+					title: 'General Manager and Vice President',
+				},
+				bonner: {
+					isKSAT: true,
+					name: 'Bernice Kearney Bonner',
+					title: 'News Director',
+				},
+				cuccio: {
+					isKSAT: true,
+					name: 'David Cuccio',
+					title: 'Creative Services Director',
+				},
+				pari: {
+					isKSAT: true,
+					name: 'Ursula Pari',
+					title: 'News Anchor',
+				},
+				loyd: {
+					isKSAT: true,
+					name: 'Ryan Loyd',
+					title: 'Digital Reporter',
+				},
+			};
+
+			function ModalManager (modalID) {
+				this.modalID 		= modalID;
+				this.modalIsOpen 	= false;
+				this.openModal		= this.openModal.bind(this);
+				this.closeModal		= this.closeModal.bind(this);
+				this.loadJQueryIfNecessary();
+			}
+
+			ModalManager.prototype = {
+				loadJQueryIfNecessary: function () {
+					var jQ;
+					if (!(typeof jQuery !== "undefined" && jQuery !== null)) {
+						jQ = document.createElement('script');
+						jQ.type = 'text/javascript';
+						jQ.onload = jQ.onreadystatechange = this.init.bind(this);
+						jQ.src = '//code.jquery.com/jquery-1.12.4.min.js';
+						return document.body.appendChild(jQ);
+					} else {
+						return this.init();
+					}
+				},
+
+				init: function () {
+					this.$wrapper	= $('#' + this.modalID);
+					this.$modal		= this.$wrapper.children('.modal');
+					this.$org		= this.$modal.children('.org');
+					this.$name		= this.$modal.children('.name');
+					this.$title		= this.$modal.children('.title');
+					this.$closeBtn 	= this.$modal.children('.modal-close-btn');
+					this.$nameRefs	= $('.name-ref');
+					this.setEvents();
+				},
+
+				setOrg: function (isKSAT) {
+					var orgClass 	= isKSAT ? 'ksat' : 'tricentennial';
+					var orgName		= isKSAT ? 'KSAT' : 'Tricentennial Comission';
+					this.$org.addClass(orgClass);
+					this.$org.html(orgName);
+				},
+
+				hydratedModal(key) {
+					var character 	= characters[key];
+					this.setOrg(character.isKSAT);
+					this.$name.html(character.name);
+					this.$title.html(character.title);
+				},
+
+				emptyModal() {
+					this.$org.removeClass('ksat', 'tricentennial');
+					this.$org.empty();
+					this.$name.empty();
+					this.$title.empty();
+				},
+
+				openModal(e) {
+					this.hydratedModal(e.target.id);
+					this.$wrapper.css('display', 'block');
+				},
+
+				closeModal() {
+					this.emptyModal();
+					this.$wrapper.css('display', 'none');
+				},
+
+				setEvents: function () {
+					var that = this;
+					this.$nameRefs.click(this.openModal);
+					this.$closeBtn.click(this.closeModal);
+					this.$wrapper.click(function (e) {
+						if (e.target === this) {
+							that.closeModal();
+						}
+					})
+				},
+			};
+
+			new ModalManager('source-reference');
+		}())
+	</script>
+</body>
+</html>
